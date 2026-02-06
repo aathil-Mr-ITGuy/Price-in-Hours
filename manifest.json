@@ -29,7 +29,7 @@
     {
       "matches": ["*://*.amazon.ae/*"],
       "css": ["content/inject.css"],
-      "js": ["content/core.js"]
+      "js": ["content/core.js", "content/sites/amazon.ae.js"]
     },
     {
       "matches": ["*://*.flipkart.com/*"],
