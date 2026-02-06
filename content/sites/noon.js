@@ -7,14 +7,17 @@
   const settings = await PriceInHours.loadSettings();
   if (!settings || !settings.hourlyRate) return;
 
-  // Selectors for noon.com
-  // Note: These might change, so we try multiple strategies
+  // Selectors for noon.com - target the actual price TEXT elements, not containers
+  // This avoids grabbing both current and old price text together
   const SELECTORS = [
-    '[data-qa="div-price-now"]', // Product page main price
-    '.amount',                   // Listing pages (common class)
-    '.priceNow',                 // Alternative
-    '[class*="priceWrapper"]'     // Flexible match
+    // PDP: Product Details Page - the span with the actual price number
+    '[class*="priceNowText"]',
+    // PLP: Product Listing Page - the strong with class containing "amount"
+    'strong[class*="amount"]'
   ];
+  
+  // Elements to skip (old/strikethrough prices)
+  const SKIP_SELECTORS = ['[class*="oldPrice"]', '[class*="priceWas"]'];
 
   function processPrices() {
     SELECTORS.forEach(selector => {
@@ -27,12 +30,16 @@
     // Avoid double tagging
     if (el.dataset.pihProcessed) return;
     
-    // Check if it looks like a price (contains currency or digits)
+    // Skip old/strikethrough prices
+    for (const skipSel of SKIP_SELECTORS) {
+      if (el.matches(skipSel) || el.closest(skipSel)) return;
+    }
+    
+    // Check if it contains digits
     const text = el.textContent.trim();
     if (!text.match(/\d/)) return;
 
     // Extract price value (remove currency, commas)
-    // noon.com example: "AED 123.45" or "123.45 AED"
     const priceMatch = text.match(/[\d,]+\.?\d*/);
     if (!priceMatch) return;
 
@@ -42,8 +49,6 @@
     // Create badge
     const badge = PriceInHours.createBadge(priceVal);
     if (badge) {
-      // Find a good spot to insert - preferably after the price element
-      // specific logic per selector type could go here if needed
       el.appendChild(badge);
       el.dataset.pihProcessed = 'true';
     }
@@ -55,7 +60,6 @@
   // Observer for dynamic content (scrolling, navigation)
   let timeout;
   const observer = new MutationObserver(() => {
-    // Debounce to improve performance
     clearTimeout(timeout);
     timeout = setTimeout(processPrices, 500);
   });
@@ -68,3 +72,4 @@
   console.log('Price in Hours: Active on noon.com');
 
 })();
+

@@ -22,13 +22,27 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "*://*.noon.com/*",
-        "*://*.amazon.ae/*",
-        "*://*.flipkart.com/*",
-        "*://*.amazon.in/*",
-        "*://*.myntra.com/*"
-      ],
+      "matches": ["*://*.noon.com/*"],
+      "css": ["content/inject.css"],
+      "js": ["content/core.js", "content/sites/noon.js"]
+    },
+    {
+      "matches": ["*://*.amazon.ae/*"],
+      "css": ["content/inject.css"],
+      "js": ["content/core.js"]
+    },
+    {
+      "matches": ["*://*.flipkart.com/*"],
+      "css": ["content/inject.css"],
+      "js": ["content/core.js"]
+    },
+    {
+      "matches": ["*://*.amazon.in/*"],
+      "css": ["content/inject.css"],
+      "js": ["content/core.js"]
+    },
+    {
+      "matches": ["*://*.myntra.com/*"],
       "css": ["content/inject.css"],
       "js": ["content/core.js"]
     }
