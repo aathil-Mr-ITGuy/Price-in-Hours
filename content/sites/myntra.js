@@ -35,6 +35,12 @@
   function processElement(el) {
     if (el.dataset.pihProcessed) return;
     
+    // Skip if parent is already processed (prevents duplicate badges)
+    if (el.closest('[data-pih-processed]')) return;
+    
+    // Skip if this element already contains a processed child
+    if (el.querySelector('[data-pih-processed]')) return;
+    
     for (const skipSel of SKIP_SELECTORS) {
       if (el.matches(skipSel) || el.closest(skipSel)) return;
     }
