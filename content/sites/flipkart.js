@@ -1,58 +1,83 @@
 /**
  * flipkart.com Price Detection Script
+ * Uses content-based detection since Flipkart uses dynamic/hashed class names
  */
 
 (async function() {
   const settings = await PriceInHours.loadSettings();
   if (!settings || !settings.hourlyRate) return;
 
-  // Selectors for Flipkart (updated Feb 2026)
-  const SELECTORS = [
-    // Product listing & detail pages - current price
-    '.hZ3P6w',                     // Main sale price (both listing & PDP)
-    'div[class*="Nx9bqj"]',        // Alternate price class
-    // Legacy selectors (keeping for older pages)
-    '._30jeq3',                    // Legacy price class
-    '._30jeq3._16Jk6d'             // Legacy PDP price
-  ];
+  // Price regex: matches ₹ followed by digits with optional commas
+  const PRICE_REGEX = /^₹[\d,]+$/;
   
-  // Skip these (strikethrough/original prices)
-  const SKIP_SELECTORS = [
-    '.kRYCnD',                     // Current strike price class
-    '._3I9_wc',                    // Legacy strike price
-    'div[class*="yRaY8j"]'         // Original price
-  ];
+  // Strikethrough price indicators
+  const STRIKE_INDICATORS = ['text-decoration: line-through', 'off', '%'];
 
-  function processPrices() {
-    SELECTORS.forEach(selector => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach(el => processElement(el));
-    });
+  function isStrikePrice(el) {
+    // Check if element has line-through style
+    const style = window.getComputedStyle(el);
+    if (style.textDecoration.includes('line-through')) return true;
+    
+    // Check if parent has line-through
+    if (el.parentElement) {
+      const parentStyle = window.getComputedStyle(el.parentElement);
+      if (parentStyle.textDecoration.includes('line-through')) return true;
+    }
+    
+    // Check if next sibling contains "off" (indicating this is original price)
+    const nextSibling = el.nextElementSibling;
+    if (nextSibling && nextSibling.textContent.toLowerCase().includes('off')) {
+      return true;
+    }
+    
+    return false;
   }
 
-  function processElement(el) {
-    if (el.dataset.pihProcessed) return;
-    
-    // Skip strikethrough prices
-    for (const skipSel of SKIP_SELECTORS) {
-      if (el.matches(skipSel) || el.closest(skipSel)) return;
+  function processPrices() {
+    // Find all elements that contain rupee symbol
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function(node) {
+          const text = node.textContent.trim();
+          if (PRICE_REGEX.test(text)) {
+            return NodeFilter.FILTER_ACCEPT;
+          }
+          return NodeFilter.FILTER_SKIP;
+        }
+      }
+    );
+
+    const priceNodes = [];
+    while (walker.nextNode()) {
+      priceNodes.push(walker.currentNode);
     }
-    
-    const text = el.textContent.trim();
-    if (!text.match(/\d/)) return;
 
-    // Flipkart format: "₹1,234" or "₹1,234.00"
-    const priceMatch = text.match(/[\d,]+\.?\d*/);
-    if (!priceMatch) return;
+    priceNodes.forEach(textNode => {
+      const el = textNode.parentElement;
+      if (!el || el.dataset.pihProcessed) return;
+      
+      // Skip if already has a badge inside
+      if (el.querySelector('.pih-badge')) return;
+      if (el.closest('[data-pih-processed]')) return;
+      
+      // Skip strikethrough prices
+      if (isStrikePrice(el)) return;
+      
+      const text = textNode.textContent.trim();
+      const priceMatch = text.match(/[\d,]+/);
+      if (!priceMatch) return;
 
-    const priceVal = parseFloat(priceMatch[0].replace(/,/g, ''));
-    if (isNaN(priceVal) || priceVal === 0) return;
+      const priceVal = parseFloat(priceMatch[0].replace(/,/g, ''));
+      if (isNaN(priceVal) || priceVal === 0) return;
 
-    const badge = PriceInHours.createBadge(priceVal);
-    if (badge) {
-      el.appendChild(badge);
-      el.dataset.pihProcessed = 'true';
-    }
+      const badge = PriceInHours.createBadge(priceVal);
+      if (badge) {
+        el.appendChild(badge);
+        el.dataset.pihProcessed = 'true';
+      }
+    });
   }
 
   setTimeout(processPrices, 1000);
@@ -65,5 +90,5 @@
 
   observer.observe(document.body, { childList: true, subtree: true });
 
-  console.log('Price in Hours: Active on flipkart.com');
+  console.log('Price in Hours: Active on flipkart.com (content-based detection)');
 })();
