@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Price in Hours Settings</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Price in Hours</h2>
+      <p class="subtitle">Salary Config</p>
+
+      <div class="form-group">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="AED">AED (UAE)</option>
+          <option value="INR">INR (India)</option>
+          <option value="USD">USD (Global)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="salaryType">Salary Period</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-value="monthly">
+            Monthly
+          </button>
+          <button class="toggle-btn" data-value="daily">Daily</button>
+          <button class="toggle-btn" data-value="hourly">Hourly</button>
+        </div>
+        <input type="hidden" id="salaryType" value="monthly" />
+      </div>
+
+      <div class="form-group">
+        <label for="salaryInput">Amount</label>
+        <input type="number" id="salaryInput" placeholder="e.g. 5000" />
+      </div>
+
+      <div id="monthlyFields" class="conditional-fields">
+        <div class="form-group">
+          <label for="daysPerMonth">Work Days / Month</label>
+          <input type="number" id="daysPerMonth" value="22" />
+        </div>
+      </div>
+
+      <div id="dailyFields" class="conditional-fields">
+        <div class="form-group">
+          <label for="hoursPerDay">Work Hours / Day</label>
+          <input type="number" id="hoursPerDay" value="8" />
+        </div>
+      </div>
+
+      <div class="preview-section">
+        <p>Your calculated hourly rate:</p>
+        <h3 id="hourlyRateDisplay">
+          0.00 <span id="currencyDisplay">AED</span>/hr
+        </h3>
+      </div>
+
+      <button id="saveBtn">Save Settings</button>
+      <p id="status" class="status"></p>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

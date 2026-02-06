@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Price in Hours",
+  "version": "1.0",
+  "description": "Convert e-commerce prices into hours of work based on your salary.",
+  "permissions": ["storage", "activeTab"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon128.png",
+      "48": "icons/icon128.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon128.png",
+    "48": "icons/icon128.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.noon.com/*",
+        "*://*.amazon.ae/*",
+        "*://*.flipkart.com/*",
+        "*://*.amazon.in/*",
+        "*://*.myntra.com/*"
+      ],
+      "css": ["content/inject.css"],
+      "js": ["content/core.js"]
+    }
+  ]
+}

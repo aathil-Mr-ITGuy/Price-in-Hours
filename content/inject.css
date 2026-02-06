@@ -1,0 +1,23 @@
+/* Styles for the injected price badge */
+.pih-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #27ae60;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    margin-left: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    cursor: help;
+    z-index: 9999;
+}
+
+.pih-badge:hover {
+    background-color: #219150;
+}
+
+.pih-icon {
+    margin-right: 4px;
+}
