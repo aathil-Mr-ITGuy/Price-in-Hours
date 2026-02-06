@@ -34,17 +34,17 @@
     {
       "matches": ["*://*.flipkart.com/*"],
       "css": ["content/inject.css"],
-      "js": ["content/core.js"]
+      "js": ["content/core.js", "content/sites/flipkart.js"]
     },
     {
       "matches": ["*://*.amazon.in/*"],
       "css": ["content/inject.css"],
-      "js": ["content/core.js"]
+      "js": ["content/core.js", "content/sites/amazon.in.js"]
     },
     {
       "matches": ["*://*.myntra.com/*"],
       "css": ["content/inject.css"],
-      "js": ["content/core.js"]
+      "js": ["content/core.js", "content/sites/myntra.js"]
     }
   ]
 }
