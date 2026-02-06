@@ -13,31 +13,61 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById('saveBtn');
   const status = document.getElementById('status');
 
+  // State to store separate values for each mode
+  const state = {
+    monthly: '',
+    daily: '',
+    hourly: ''
+  };
+
   // Load saved settings
   chrome.storage.local.get(
-    ['currency', 'salaryType', 'salary', 'daysPerMonth', 'hoursPerDay'],
+    ['currency', 'salaryType', 'salaries', 'daysPerMonth', 'hoursPerDay'],
     (data) => {
       if (data.currency) currencySelect.value = data.currency;
-      if (data.salaryType) setSalaryType(data.salaryType);
-      if (data.salary) salaryInput.value = data.salary;
+      
+      // Load saved salaries into state
+      if (data.salaries) {
+        Object.assign(state, data.salaries);
+      }
+      
       if (data.daysPerMonth) daysPerMonthInput.value = data.daysPerMonth;
       if (data.hoursPerDay) hoursPerDayInput.value = data.hoursPerDay;
       
-      updateUI();
-      calculateRate();
+      // Set active type and populate input
+      if (data.salaryType) {
+        setSalaryType(data.salaryType);
+      } else {
+        setSalaryType('monthly'); // default
+      }
+      
+      updateUI(); // Set visibility
+      calculateRate(); // Initial calc
     }
   );
 
   // Event Listeners
   toggleBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
-      setSalaryType(e.target.dataset.value);
+      const newType = e.target.dataset.value;
+      const oldType = salaryTypeInput.value;
+      
+      // Save current input to state before switching
+      state[oldType] = salaryInput.value;
+      
+      setSalaryType(newType);
       updateUI();
       calculateRate();
     });
   });
 
-  [salaryInput, daysPerMonthInput, hoursPerDayInput, currencySelect].forEach(el => {
+  salaryInput.addEventListener('input', (e) => {
+    // Update state as user types
+    state[salaryTypeInput.value] = e.target.value;
+    calculateRate();
+  });
+
+  [daysPerMonthInput, hoursPerDayInput, currencySelect].forEach(el => {
     el.addEventListener('input', () => {
       calculateRate();
       updateUI();
@@ -49,10 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Functions
   function setSalaryType(type) {
     salaryTypeInput.value = type;
+    
+    // Update buttons
     toggleBtns.forEach(btn => {
       if (btn.dataset.value === type) btn.classList.add('active');
       else btn.classList.remove('active');
     });
+
+    // Restore value for this type
+    salaryInput.value = state[type] || '';
   }
 
   function updateUI() {
@@ -60,11 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const cur = currencySelect.value;
     currencyDisplay.textContent = cur;
 
-    // Logic for showing/hiding fields based on type
-    // Monthly: needs Days/Month AND Hours/Day to get hourly rate
-    // Daily: needs Hours/Day to get hourly rate
-    // Hourly: needs nothing else
-    
     if (type === 'monthly') {
       monthlyFields.style.display = 'block';
       dailyFields.style.display = 'block';
@@ -103,10 +133,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function saveSettings() {
+    // Ensure current input is saved to state
+    state[salaryTypeInput.value] = salaryInput.value;
+
     const settings = {
       currency: currencySelect.value,
       salaryType: salaryTypeInput.value,
-      salary: parseFloat(salaryInput.value),
+      salaries: state, // Save all 3 states
       daysPerMonth: parseFloat(daysPerMonthInput.value),
       hoursPerDay: parseFloat(hoursPerDayInput.value),
       hourlyRate: calculateRate() // Cache the calculated rate
