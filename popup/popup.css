@@ -215,3 +215,65 @@ select:focus {
   font-size: 0.75em;
   color: #95a5a6;
 }
+
+/* Exchange Rates Section */
+.exchange-rates-section {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.exchange-rates-section summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #34495e;
+  font-size: 0.9em;
+  list-style: none;
+}
+
+.exchange-rates-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.exchange-rates-section summary::before {
+  content: "▶ ";
+  font-size: 0.7em;
+}
+
+.exchange-rates-section[open] summary::before {
+  content: "▼ ";
+}
+
+.exchange-rates-section .help-text {
+  font-size: 0.75em;
+  color: #7f8c8d;
+  margin: 8px 0;
+}
+
+.exchange-rate-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.exchange-rate-row label {
+  min-width: 45px;
+  margin-bottom: 0;
+  font-size: 0.85em;
+}
+
+.exchange-rate-row input {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 0.85em;
+}
+
+.exchange-rate-row .equals {
+  font-size: 0.85em;
+  color: #7f8c8d;
+}
+

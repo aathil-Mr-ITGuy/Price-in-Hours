@@ -47,7 +47,7 @@
     if (isNaN(priceVal)) return;
 
     // Create badge
-    const badge = PriceInHours.createBadge(priceVal);
+    const badge = PriceInHours.createBadge(priceVal, 'AED');
     if (badge) {
       el.appendChild(badge);
       el.dataset.pihProcessed = 'true';

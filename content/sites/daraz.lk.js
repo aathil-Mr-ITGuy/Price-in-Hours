@@ -53,7 +53,7 @@
       const priceVal = parseFloat(priceMatch[0].replace(/,/g, ''));
       if (isNaN(priceVal) || priceVal === 0) return;
 
-      const badge = PriceInHours.createBadge(priceVal);
+      const badge = PriceInHours.createBadge(priceVal, 'LKR');
       if (badge) {
         el.appendChild(badge);
         el.dataset.pihProcessed = 'true';
@@ -94,7 +94,7 @@
       const priceVal = parseFloat(priceMatch[0].replace(/,/g, ''));
       if (isNaN(priceVal) || priceVal === 0) return;
 
-      const badge = PriceInHours.createBadge(priceVal);
+      const badge = PriceInHours.createBadge(priceVal, 'LKR');
       if (badge) {
         el.appendChild(badge);
         el.dataset.pihProcessed = 'true';

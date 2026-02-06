@@ -13,6 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById('saveBtn');
   const status = document.getElementById('status');
   const enableToggle = document.getElementById('enableToggle');
+  const baseCurrencyLabel = document.getElementById('baseCurrencyLabel');
+  const exchangeRatesContainer = document.getElementById('exchangeRatesContainer');
+
+  // All supported currencies with default exchange rates (relative to USD)
+  const ALL_CURRENCIES = ['AED', 'INR', 'LKR', 'USD'];
+  const DEFAULT_RATES = {
+    // How many units = 1 USD (approximate rates)
+    'AED': 3.67,
+    'INR': 83,
+    'LKR': 320,
+    'USD': 1
+  };
 
   // State to store separate values for each mode
   const state = {
@@ -21,9 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
     hourly: ''
   };
 
+  // Exchange rates state (stored as: how many units of X = 1 base currency)
+  let exchangeRates = {};
+
   // Load saved settings
   chrome.storage.local.get(
-    ['currency', 'salaryType', 'salaries', 'daysPerMonth', 'hoursPerDay', 'enabled'],
+    ['currency', 'salaryType', 'salaries', 'daysPerMonth', 'hoursPerDay', 'enabled', 'exchangeRates'],
     (data) => {
       if (data.currency) currencySelect.value = data.currency;
       
@@ -35,22 +50,76 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.assign(state, data.salaries);
       }
       
+      // Load exchange rates
+      if (data.exchangeRates) {
+        exchangeRates = data.exchangeRates;
+      } else {
+        // Initialize with defaults
+        exchangeRates = calculateDefaultRates(currencySelect.value);
+      }
+      
       if (data.daysPerMonth) daysPerMonthInput.value = data.daysPerMonth;
       if (data.hoursPerDay) hoursPerDayInput.value = data.hoursPerDay;
       
       // Set active type and populate input
       if (data.salaryType) {
         setSalaryType(data.salaryType);
-        salaryInput.value = state[data.salaryType] || ''; // explicit restore on load
+        salaryInput.value = state[data.salaryType] || '';
       } else {
         setSalaryType('monthly'); 
         salaryInput.value = state['monthly'] || '';
       }
       
-      updateUI(); // Set visibility
-      calculateRate(); // Initial calc
+      updateUI();
+      updateExchangeRatesUI();
+      calculateRate();
     }
   );
+
+  // Calculate default rates relative to a base currency
+  function calculateDefaultRates(baseCurrency) {
+    const rates = {};
+    const baseToUSD = 1 / DEFAULT_RATES[baseCurrency];
+    
+    ALL_CURRENCIES.forEach(cur => {
+      if (cur !== baseCurrency) {
+        // How many of this currency = 1 base currency
+        rates[cur] = (DEFAULT_RATES[cur] * baseToUSD).toFixed(2);
+      }
+    });
+    
+    return rates;
+  }
+
+  // Update exchange rates UI
+  function updateExchangeRatesUI() {
+    const baseCurrency = currencySelect.value;
+    baseCurrencyLabel.textContent = baseCurrency;
+    
+    exchangeRatesContainer.innerHTML = '';
+    
+    ALL_CURRENCIES.forEach(cur => {
+      if (cur === baseCurrency) return; // Skip base currency
+      
+      const row = document.createElement('div');
+      row.className = 'exchange-rate-row';
+      
+      const rate = exchangeRates[cur] || calculateDefaultRates(baseCurrency)[cur] || 1;
+      
+      row.innerHTML = `
+        <label>${cur}</label>
+        <input type="number" step="0.01" id="rate_${cur}" value="${rate}" data-currency="${cur}">
+        <span class="equals">= 1 ${baseCurrency}</span>
+      `;
+      
+      exchangeRatesContainer.appendChild(row);
+      
+      // Add event listener
+      row.querySelector('input').addEventListener('input', (e) => {
+        exchangeRates[e.target.dataset.currency] = parseFloat(e.target.value) || 0;
+      });
+    });
+  }
 
   // Enable/Disable Toggle
   enableToggle.addEventListener('change', () => {
@@ -60,11 +129,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Currency change handler
+  currencySelect.addEventListener('change', () => {
+    // Recalculate exchange rates for new base currency
+    exchangeRates = calculateDefaultRates(currencySelect.value);
+    updateExchangeRatesUI();
+    calculateRate();
+    updateUI();
+  });
+
   // Event Listeners
   toggleBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       const newType = e.target.dataset.value;
-      const currentRate = calculateRate(); // Get current hourly rate before switching
+      const currentRate = calculateRate();
 
       // Update state for current type before switching
       state[salaryTypeInput.value] = salaryInput.value;
@@ -85,8 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
           convertedValue = currentRate;
         }
 
-        // Update input and state with converted value (formatted cleanly)
-        // Check if it's an integer to avoid ugly decimals where possible
         const cleanValue = Number.isInteger(convertedValue) ? convertedValue : convertedValue.toFixed(2);
         
         salaryInput.value = cleanValue;
@@ -99,12 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   salaryInput.addEventListener('input', (e) => {
-    // Update state as user types
     state[salaryTypeInput.value] = e.target.value;
     calculateRate();
   });
 
-  [daysPerMonthInput, hoursPerDayInput, currencySelect].forEach(el => {
+  [daysPerMonthInput, hoursPerDayInput].forEach(el => {
     el.addEventListener('input', () => {
       calculateRate();
       updateUI();
@@ -117,16 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function setSalaryType(type) {
     salaryTypeInput.value = type;
     
-    // Update buttons
     toggleBtns.forEach(btn => {
       if (btn.dataset.value === type) btn.classList.add('active');
       else btn.classList.remove('active');
     });
-
-    // Note: We don't auto-restore state here anymore because the click handler 
-    // handles "smart conversion". But for initial load, we might need it.
-    // If called programmatically without conversion logic, we should restore.
-    // However, keeping the input sync is redundant if logic is in click handler.
   }
 
   function updateUI() {
@@ -166,7 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
       hourlyRate = salary;
     }
 
-    // Format to 2 decimals
     hourlyRateDisplay.textContent = hourlyRate.toFixed(2) + ' ' + currencySelect.value + '/hr';
     return hourlyRate;
   }
@@ -175,13 +243,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure current input is saved to state
     state[salaryTypeInput.value] = salaryInput.value;
 
+    // Collect exchange rates from inputs
+    const rateInputs = exchangeRatesContainer.querySelectorAll('input');
+    rateInputs.forEach(input => {
+      exchangeRates[input.dataset.currency] = parseFloat(input.value) || 0;
+    });
+
     const settings = {
       currency: currencySelect.value,
       salaryType: salaryTypeInput.value,
-      salaries: state, // Save all 3 states
+      salaries: state,
       daysPerMonth: parseFloat(daysPerMonthInput.value),
       hoursPerDay: parseFloat(hoursPerDayInput.value),
-      hourlyRate: calculateRate() // Cache the calculated rate
+      hourlyRate: calculateRate(),
+      exchangeRates: exchangeRates
     };
 
     chrome.storage.local.set(settings, () => {

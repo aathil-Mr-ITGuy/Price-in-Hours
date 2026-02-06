@@ -48,7 +48,7 @@
     const priceVal = parseFloat(priceMatch[0].replace(/,/g, ''));
     if (isNaN(priceVal) || priceVal === 0) return;
 
-    const badge = PriceInHours.createBadge(priceVal);
+    const badge = PriceInHours.createBadge(priceVal, 'INR');
     if (badge) {
       const priceContainer = el.closest('.a-price') || el.parentElement;
       if (priceContainer && !priceContainer.querySelector('.pih-badge')) {

@@ -56,7 +56,7 @@
     if (isNaN(priceVal) || priceVal === 0) return;
 
     // Create badge
-    const badge = PriceInHours.createBadge(priceVal);
+    const badge = PriceInHours.createBadge(priceVal, 'AED');
     if (badge) {
       // For .a-offscreen elements, append to parent .a-price instead
       const priceContainer = el.closest('.a-price') || el.parentElement;
