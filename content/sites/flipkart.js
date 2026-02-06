@@ -6,20 +6,20 @@
   const settings = await PriceInHours.loadSettings();
   if (!settings || !settings.hourlyRate) return;
 
-  // Selectors for Flipkart
+  // Selectors for Flipkart (updated Feb 2026)
   const SELECTORS = [
-    // Product listing pages
-    '._30jeq3',                    // Main price on product cards
+    // Product listing & detail pages - current price
+    '.hZ3P6w',                     // Main sale price (both listing & PDP)
     'div[class*="Nx9bqj"]',        // Alternate price class
-    // Product detail pages
-    '._30jeq3._16Jk6d',            // PDP price
-    'div[class*="CEmiEU"]',        // PDP price container
-    '._25b18c ._30jeq3'            // Price in buy box
+    // Legacy selectors (keeping for older pages)
+    '._30jeq3',                    // Legacy price class
+    '._30jeq3._16Jk6d'             // Legacy PDP price
   ];
   
-  // Skip these (strikethrough prices)
+  // Skip these (strikethrough/original prices)
   const SKIP_SELECTORS = [
-    '._3I9_wc',                    // Strike price
+    '.kRYCnD',                     // Current strike price class
+    '._3I9_wc',                    // Legacy strike price
     'div[class*="yRaY8j"]'         // Original price
   ];
 
