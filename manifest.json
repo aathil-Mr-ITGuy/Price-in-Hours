@@ -45,6 +45,16 @@
       "matches": ["*://*.myntra.com/*"],
       "css": ["content/inject.css"],
       "js": ["content/core.js", "content/sites/myntra.js"]
+    },
+    {
+      "matches": ["*://*.daraz.lk/*"],
+      "css": ["content/inject.css"],
+      "js": ["content/core.js", "content/sites/daraz.lk.js"]
+    },
+    {
+      "matches": ["*://*.ikman.lk/*"],
+      "css": ["content/inject.css"],
+      "js": ["content/core.js", "content/sites/ikman.lk.js"]
     }
   ]
 }
