@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const currencyDisplay = document.getElementById('currencyDisplay');
   const saveBtn = document.getElementById('saveBtn');
   const status = document.getElementById('status');
+  const enableToggle = document.getElementById('enableToggle');
 
   // State to store separate values for each mode
   const state = {
@@ -22,9 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load saved settings
   chrome.storage.local.get(
-    ['currency', 'salaryType', 'salaries', 'daysPerMonth', 'hoursPerDay'],
+    ['currency', 'salaryType', 'salaries', 'daysPerMonth', 'hoursPerDay', 'enabled'],
     (data) => {
       if (data.currency) currencySelect.value = data.currency;
+      
+      // Load enabled state (default to true)
+      enableToggle.checked = data.enabled !== false;
       
       // Load saved salaries into state
       if (data.salaries) {
@@ -47,6 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
       calculateRate(); // Initial calc
     }
   );
+
+  // Enable/Disable Toggle
+  enableToggle.addEventListener('change', () => {
+    chrome.storage.local.set({ enabled: enableToggle.checked }, () => {
+      status.textContent = enableToggle.checked ? 'Extension enabled!' : 'Extension disabled';
+      setTimeout(() => { status.textContent = ''; }, 2000);
+    });
+  });
 
   // Event Listeners
   toggleBtns.forEach(btn => {

@@ -3,11 +3,19 @@ window.PriceInHours = {
 
   /**
    * Load settings from local storage
-   * @returns {Promise<Object>}
+   * @returns {Promise<Object|null>} Returns null if extension is disabled
    */
   loadSettings: function() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(['hourlyRate', 'currency'], (data) => {
+      chrome.storage.local.get(['hourlyRate', 'currency', 'enabled'], (data) => {
+        // Check if extension is disabled
+        if (data.enabled === false) {
+          console.log('Price in Hours: Extension is disabled');
+          this.settings = null;
+          resolve(null);
+          return;
+        }
+        
         this.settings = data;
         console.log('Price in Hours: Settings loaded', this.settings);
         resolve(data);

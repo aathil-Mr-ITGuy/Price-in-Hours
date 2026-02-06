@@ -7,8 +7,16 @@
   </head>
   <body>
     <div class="container">
-      <h2>Price in Hours</h2>
-      <p class="subtitle">Salary Config</p>
+      <div class="header">
+        <div>
+          <h2>Price in Hours</h2>
+          <p class="subtitle">Salary Config</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="enableToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
 
       <div class="form-group">
         <label for="currency">Currency</label>
@@ -59,6 +67,16 @@
 
       <button id="saveBtn">Save Settings</button>
       <p id="status" class="status"></p>
+      
+      <div class="footer">
+        <a href="https://github.com/aathil-Mr-ITGuy/Price-in-Hours" target="_blank" class="github-link">
+          ⭐ Star
+        </a>
+        <a href="https://github.com/aathil-Mr-ITGuy/Price-in-Hours/issues" target="_blank" class="feedback-link">
+          💬 Feedback
+        </a>
+        <span class="version">v1.0</span>
+      </div>
     </div>
     <script src="popup.js"></script>
   </body>

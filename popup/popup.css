@@ -18,9 +18,62 @@ h2 {
 }
 
 .subtitle {
-  margin: 5px 0 20px;
+  margin: 2px 0 0;
   color: #7f8c8d;
   font-size: 0.9em;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 26px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #27ae60;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
 }
 
 .form-group {
@@ -123,4 +176,42 @@ select:focus {
 
 .conditional-fields {
   display: block;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+}
+
+.github-link {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.github-link:hover {
+  color: #2980b9;
+}
+
+.feedback-link {
+  color: #9b59b6;
+  text-decoration: none;
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.feedback-link:hover {
+  color: #8e44ad;
+}
+
+.version {
+  font-size: 0.75em;
+  color: #95a5a6;
 }
