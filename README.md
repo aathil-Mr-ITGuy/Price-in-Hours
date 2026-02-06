@@ -5,20 +5,22 @@ A Chrome extension that converts e-commerce prices into hours of work based on y
 ## Features
 
 ✅ **Salary Configuration**: Set your monthly, daily, or hourly rate  
-✅ **Multiple Currencies**: Supports AED, INR, and USD  
+✅ **Multiple Currencies**: Supports AED, INR, LKR, and USD  
 ✅ **Smart Conversion**: Automatically calculates your hourly rate  
 ✅ **Price Badges**: Shows hours needed next to product prices  
 ✅ **Privacy First**: All data stored locally, nothing sent to servers
 
 ## Supported Sites
 
-| Site            | Region |
-| --------------- | ------ |
-| 🛍️ noon.com     | UAE    |
-| 🛒 amazon.ae    | UAE    |
-| 🛒 amazon.in    | India  |
-| 📦 flipkart.com | India  |
-| 👗 myntra.com   | India  |
+| Site            | Region    |
+| --------------- | --------- |
+| 🛍️ noon.com     | UAE       |
+| 🛒 amazon.ae    | UAE       |
+| 🛒 amazon.in    | India     |
+| 📦 flipkart.com | India     |
+| 👗 myntra.com   | India     |
+| 🛒 daraz.lk     | Sri Lanka |
+| 📋 ikman.lk     | Sri Lanka |
 
 ## Installation
 
@@ -37,7 +39,7 @@ _(Coming soon)_
 ## Usage
 
 1. Click the extension icon in Chrome toolbar
-2. Select your currency (AED, INR, USD)
+2. Select your currency (AED, INR, LKR, USD)
 3. Choose salary type (Monthly/Daily/Hourly)
 4. Enter your salary amount
 5. Configure work days/hours if needed
