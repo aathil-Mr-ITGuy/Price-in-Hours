@@ -37,8 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Set active type and populate input
       if (data.salaryType) {
         setSalaryType(data.salaryType);
+        salaryInput.value = state[data.salaryType] || ''; // explicit restore on load
       } else {
-        setSalaryType('monthly'); // default
+        setSalaryType('monthly'); 
+        salaryInput.value = state['monthly'] || '';
       }
       
       updateUI(); // Set visibility
@@ -50,12 +52,35 @@ document.addEventListener('DOMContentLoaded', () => {
   toggleBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       const newType = e.target.dataset.value;
-      const oldType = salaryTypeInput.value;
-      
-      // Save current input to state before switching
-      state[oldType] = salaryInput.value;
+      const currentRate = calculateRate(); // Get current hourly rate before switching
+
+      // Update state for current type before switching
+      state[salaryTypeInput.value] = salaryInput.value;
       
       setSalaryType(newType);
+      
+      // Smart Conversion: If we have a valid rate, auto-fill the new mode
+      if (currentRate > 0) {
+        let convertedValue = 0;
+        const days = parseFloat(daysPerMonthInput.value) || 22;
+        const hours = parseFloat(hoursPerDayInput.value) || 8;
+
+        if (newType === 'monthly') {
+          convertedValue = currentRate * hours * days;
+        } else if (newType === 'daily') {
+          convertedValue = currentRate * hours;
+        } else { // hourly
+          convertedValue = currentRate;
+        }
+
+        // Update input and state with converted value (formatted cleanly)
+        // Check if it's an integer to avoid ugly decimals where possible
+        const cleanValue = Number.isInteger(convertedValue) ? convertedValue : convertedValue.toFixed(2);
+        
+        salaryInput.value = cleanValue;
+        state[newType] = cleanValue;
+      }
+      
       updateUI();
       calculateRate();
     });
@@ -86,8 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
       else btn.classList.remove('active');
     });
 
-    // Restore value for this type
-    salaryInput.value = state[type] || '';
+    // Note: We don't auto-restore state here anymore because the click handler 
+    // handles "smart conversion". But for initial load, we might need it.
+    // If called programmatically without conversion logic, we should restore.
+    // However, keeping the input sync is redundant if logic is in click handler.
   }
 
   function updateUI() {
